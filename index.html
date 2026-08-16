@@ -47,6 +47,12 @@ h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.13em;
   border-radius:99px;margin-bottom:12px}
 .badge.train{background:rgba(242,160,61,.16);color:var(--amber)}
 .badge.rest{background:rgba(95,211,168,.14);color:var(--mint)}
+.badge.mob{background:rgba(233,115,107,.15);color:var(--rose)}
+.hr{background:var(--surf2);border-radius:12px;padding:12px;text-align:center;margin-top:14px}
+.hr b{display:block;font-family:var(--data);font-size:22px;font-weight:600;color:var(--mint)}
+.hr span{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--mute)}
+.hr.ghost{border:1px dashed var(--line);background:none;cursor:pointer}
+.hr.ghost b{color:var(--mute);font-size:15px}
 .macros{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
   background:var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
 .macro{background:var(--surf);padding:11px 6px;text-align:center}
@@ -173,7 +179,48 @@ const PLAN = {
   ]}
 };
 const SWITCH = 15;                       // Sekunden Wechsel innerhalb des Paares
-const WEEK = [null,"A",null,"B",null,"C",null];   // So,Mo,Di,Mi,Do,Fr,Sa
+// So, Mo, Di, Mi, Do, Fr, Sa
+const WEEK = [
+  {t:"frei"},
+  {t:"kraft", k:"A"},
+  {t:"zone2", min:40},
+  {t:"kraft", k:"B"},
+  {t:"mob"},
+  {t:"kraft", k:"C"},
+  {t:"zone2", min:45, alt:"int"}
+];
+
+const CARDIO = {
+  zone2:{
+    name:"Zone 2",
+    was:"Rad, Crosstrainer, Ruderergometer oder zügiges Gehen mit Steigung.",
+    regel:"Du musst durchgehend in ganzen Sätzen sprechen können. Geht das nicht mehr, bist du zu schnell — das ist der zuverlässigste Test, auch ohne Pulsgurt.",
+    pct:[0.60,0.72]
+  },
+  int:{
+    name:"Intervalle",
+    was:"6–8 × 30 s hart / 90 s locker, davor 5 min ein-, danach 5 min ausrollen.",
+    regel:"Die harten 30 s sind wirklich hart — Sprechen unmöglich. Nur samstags, nie am Tag vor einer Krafteinheit.",
+    pct:[0.88,1.00]
+  }
+};
+
+// Mobility: Gegengewicht zu Schreibtisch + schweren Grundübungen
+const MOB = [
+  {n:"Katze – Kuh",            sec:45, c:"Vierfüßler. Wirbel für Wirbel rollen, Atmung mitlaufen lassen."},
+  {n:"90/90 Hüftwechsel",      sec:60, c:"Im Sitzen beide Knie 90°, langsam von Seite zu Seite. Öffnet die Hüfte für die Kniebeuge."},
+  {n:"Couch Stretch links",    sec:60, c:"Hinteres Knie an der Wand, Becken aufrichten. Für den verkürzten Hüftbeuger vom Sitzen."},
+  {n:"Couch Stretch rechts",   sec:60, c:"Gleiche Seite wechseln. Nicht ins Hohlkreuz ausweichen."},
+  {n:"Adduktoren-Rocking",     sec:45, c:"Vierfüßler, ein Bein seitlich gestreckt, langsam nach hinten schaukeln."},
+  {n:"Open Book links",        sec:45, c:"Seitlage, Knie oben angewinkelt, oberen Arm aufdrehen. Brustwirbelsäule, nicht Lendenwirbelsäule."},
+  {n:"Open Book rechts",       sec:45, c:"Seite wechseln. Blick folgt der Hand."},
+  {n:"Schulterkreisen am Band",sec:45, c:"Band oder Besenstiel weit fassen, gestreckt über den Kopf nach hinten. Für Schulterdrücken und Frontkniebeuge."},
+  {n:"Wadendehnung links",     sec:40, c:"Ferse am Boden, Knie einmal gestreckt, einmal leicht gebeugt."},
+  {n:"Wadendehnung rechts",    sec:40, c:"Seite wechseln."},
+  {n:"Bird Dog",               sec:60, c:"Gegengleich Arm und Bein strecken, Becken ruhig halten. Im Wechsel."},
+  {n:"Dead Bug",               sec:60, c:"Rückenlage, Lendenwirbelsäule bleibt am Boden. Langsam, kontrolliert."}
+];
+const MOB_SWITCH = 8;
 
 const MACROS = {
   train:{kcal:2690,p:207,f:114,kh:201},
@@ -216,8 +263,13 @@ const weights = DB.get("weights",[]); // [{d:"2026-08-16", kg:88.0}]
 
 const today = () => new Date();
 const iso = d => d.toISOString().slice(0,10);
-const dayKey = () => WEEK[today().getDay()];
+const dayPlan = () => WEEK[today().getDay()];
+const dayKey  = () => (dayPlan().t === "kraft" ? dayPlan().k : null);
 const isTrain = () => !!dayKey();
+const age = () => DB.get("age", null);
+const hrMax = () => { const a = age(); return a ? Math.round(208 - 0.7*a) : null; };
+const hrBand = pct => { const m = hrMax(); return m ? `${Math.round(m*pct[0])}–${Math.round(m*pct[1])} S/min` : null; };
+const cardioLog = DB.get("cardio", []);   // [{d, t:"zone2"|"int"|"mob", min}]
 const DAYNAME = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
 
 /* =======================================================================
@@ -235,21 +287,40 @@ function macroGrid(m){
 }
 
 function viewHeute(){
-  const k = dayKey(), t = isTrain();
+  const dp = dayPlan(), t = isTrain();
   const m = t ? MACROS.train : MACROS.rest;
   let body;
-  if(t){
-    const s = PLAN[k];
+  if(dp.t === "kraft"){
+    const sess = PLAN[dp.k];
     body = `<span class="badge train">Trainingstag</span>
-      <h1>Einheit ${k}<br>${s.name}</h1>
+      <h1>Einheit ${dp.k}<br>${sess.name}</h1>
       <p class="muted" style="margin-top:10px">31 Minuten · Antagonist-Supersätze · 14 Arbeitssätze</p>
       ${macroGrid(m)}
-      <button class="go" onclick="startRun('${k}')" style="margin-top:16px">Einheit starten</button>`;
+      <button class="go" onclick="startRun('${dp.k}')" style="margin-top:16px">Einheit starten</button>`;
+  } else if(dp.t === "zone2"){
+    const c = CARDIO.zone2, band = hrBand(c.pct);
+    body = `<span class="badge rest">Ruhetag · Ausdauer</span>
+      <h1>Zone 2<br>${dp.min} Minuten</h1>
+      <p class="muted" style="margin-top:10px">${c.was}</p>
+      ${band?`<div class="hr"><b>${band}</b><span>Zielpuls</span></div>`
+            :`<div class="hr ghost" onclick="askAge()"><b>Alter eintragen</b><span>für den Zielpuls</span></div>`}
+      <p class="muted" style="font-size:13.5px;margin-top:12px">${c.regel}</p>
+      ${macroGrid(m)}
+      ${dp.alt?`<button class="go ghost" style="margin-top:14px" onclick="startCardio('int')">Stattdessen Intervalle</button>`:""}
+      <button class="go" style="margin-top:${dp.alt?"8px":"16px"}" onclick="startCardio('zone2',${dp.min})">Zone 2 starten</button>`;
+  } else if(dp.t === "mob"){
+    const tot = Math.round(MOB.reduce((a,b)=>a+b.sec+MOB_SWITCH,0)/60);
+    body = `<span class="badge mob">Ruhetag · Mobility</span>
+      <h1>Beweglichkeit<br>${tot} Minuten</h1>
+      <p class="muted" style="margin-top:10px">${MOB.length} Positionen gegen das, was Schreibtisch und schwere Grundübungen anrichten: Hüftbeuger, Brustwirbelsäule, Sprunggelenk.</p>
+      ${macroGrid(m)}
+      <button class="go" style="margin-top:16px" onclick="startMob()">Mobility starten</button>`;
   } else {
     body = `<span class="badge rest">Ruhetag</span>
-      <h1>Kein Krafttraining</h1>
-      <p class="muted" style="margin-top:10px">Stärke heute klein halten. Wenn Zone 2 ansteht: 35–45 min, Gespräch muss möglich bleiben.</p>
-      ${macroGrid(m)}`;
+      <h1>Frei</h1>
+      <p class="muted" style="margin-top:10px">Stärke heute klein halten. Erholung ist Teil des Plans, nicht die Pause davon.</p>
+      ${macroGrid(m)}
+      <button class="go ghost" style="margin-top:16px" onclick="startMob()">Mobility freiwillig</button>`;
   }
   const avg = avg7();
   return `<div class="head wrap">
@@ -263,6 +334,10 @@ function viewHeute(){
     </div></div>`;
 }
 
+function askAge(){
+  const a = parseInt(prompt("Wie alt bist du? (nur für die Pulszonen)")||"");
+  if(a>13 && a<100){ DB.set("age", a); render(); }
+}
 function viewPlan(){
   let h = `<div class="head wrap"><div class="eyebrow">Wochenplan</div><h1>3 × 31 Minuten</h1></div><div class="wrap">`;
   for(const k of ["A","B","C"]){
@@ -283,6 +358,25 @@ function viewPlan(){
     });
     h += `<button class="go ghost" onclick="startRun('${k}')">Einheit ${k} starten</button></div>`;
   }
+  // Ausdauer
+  h += `<h2>Ausdauer</h2>`;
+  for(const key of ["zone2","int"]){
+    const c = CARDIO[key], band = hrBand(c.pct);
+    h += `<div class="card"><div class="eyebrow">${key==="zone2"?"Dienstag + Samstag":"Alternative Samstag"}</div>
+      <div style="font-family:var(--disp);font-size:21px;font-weight:700;margin:2px 0 8px">${c.name}</div>
+      <p class="muted" style="font-size:14px">${c.was}</p>
+      ${band?`<div class="hr" style="margin-top:12px"><b>${band}</b><span>Zielpuls</span></div>`:""}
+      <p class="muted" style="font-size:13.5px;margin-top:10px">${c.regel}</p>
+      <button class="go ghost" style="margin-top:12px" onclick="startCardio('${key}',${key==="zone2"?40:0})">${c.name} starten</button>
+    </div>`;
+  }
+  if(!hrMax()) h += `<div class="card"><button class="go ghost" onclick="askAge()">Alter eintragen — dann rechne ich die Pulszonen aus</button></div>`;
+
+  // Mobility
+  h += `<h2>Mobility — Donnerstag</h2><div class="card">`;
+  MOB.forEach(x => { h += `<div class="ex"><b>${x.n}</b><span class="t">${x.sec}s</span></div>`; });
+  h += `<button class="go ghost" style="margin-top:12px" onclick="startMob()">Mobility starten</button></div>`;
+
   return h + `<div class="card"><div class="eyebrow">Ablauf einer Runde</div>
     <p style="font-size:14px;margin-top:8px" class="muted">Übung 1 → ${SWITCH} s Wechsel → Übung 2 → Pause.
     Jede Muskelgruppe bekommt so 2:15–3:00 echte Erholung, weil die Gegenspieler-Übung die Pause füllt.</p></div></div>`;
@@ -337,6 +431,15 @@ function viewWerte(){
       </div>
       <p class="muted" style="font-size:13px;margin-top:12px">Nur den Schnitt bewerten, nie Einzelwerte.
       Ziel: −0,2 bis −0,4 kg pro Woche. Bleibt das Gewicht stabil, während die Gewichte im Log steigen — genau das ist Rekomposition.</p>
+    </div>`;
+  h += `<h2>Ton</h2><div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div><b style="font-size:15px">Signaltöne</b><br>
+          <span class="muted" style="font-size:13px">Drei Ticks 5 s vor Pausenende, ein langer Ton beim Weiter.</span></div>
+        <button class="go ghost" style="width:auto;padding:11px 16px;margin:0"
+          onclick="toggleMute()">${DB.get("mute",false)?"Aus":"An"}</button>
+      </div>
+      <button class="go ghost" style="margin-top:10px" onclick="audio();warn();setTimeout(buzz,900)">Töne anhören</button>
     </div>`;
   h += `<h2>Bericht</h2><div class="card">
       <p class="muted" style="font-size:13.5px">Fasst Gewichtsverlauf, alle Trainingsgewichte und die absolvierten Einheiten zusammen. Kopieren und in den Chat einfügen — daraus lassen sich Kalorien und Gewichte nachjustieren.</p>
@@ -409,6 +512,19 @@ function buildReport(){
     L.push(`${done.length} absolviert in ${weeks} Wochen (Soll ${weeks*3}) — zuletzt Einheit ${done[done.length-1].k} am ${de(done[done.length-1].d)}`);
   } else L.push("noch keine abgeschlossen");
   L.push("");
+
+  // Ausdauer & Mobility
+  L.push("AUSDAUER & MOBILITY (letzte 4 Wochen)");
+  const cut = new Date(today()); cut.setDate(cut.getDate()-28);
+  const rec = cardioLog.filter(x => new Date(x.d) >= cut);
+  if(rec.length){
+    const NM = {zone2:"Zone 2", int:"Intervalle", mob:"Mobility"};
+    ["zone2","int","mob"].forEach(k => {
+      const r2 = rec.filter(x => x.t===k);
+      if(r2.length) L.push(`${NM[k]}: ${r2.length} ${r2.length===1?"Einheit":"Einheiten"}, ${r2.reduce((a,b)=>a+b.min,0)} Minuten gesamt`);
+    });
+  } else L.push("nichts protokolliert");
+  L.push("");
   L.push("SUBJEKTIV (bitte ausfüllen)");
   L.push("Energie im Training: ");
   L.push("Schlaf: ");
@@ -430,6 +546,8 @@ function showReport(txt){
   const box = document.getElementById("rep");
   if(box){ box.classList.remove("hide"); box.value = txt; box.select(); }
 }
+
+function toggleMute(){ DB.set("mute", !DB.get("mute", false)); render(); }
 
 function addWeight(){
   const el = document.getElementById("wIn");
@@ -463,8 +581,102 @@ function buildSteps(key){
   return steps;
 }
 
+function startCardio(kind, min){
+  const c = CARDIO[kind], band = hrBand(c.pct);
+  const dur = min || (kind==="int" ? 0 : 40);
+  audio();
+  run = {mode:"cardio", kind, dur, t0:Date.now(), left: dur*60};
+  R.classList.remove("hide"); document.body.style.overflow="hidden";
+  R.innerHTML = `<div class="rbar"><i style="width:0%"></i></div>
+    <div class="rtop"><button class="eyebrow" onclick="endCardio()">Beenden</button>
+      <span class="eyebrow">${c.name}</span></div>
+    <div class="rmid">
+      <div class="lbl">${dur?"Zielzeit "+dur+" min":"Freie Dauer"}</div>
+      <div class="clock" id="clk">0:00</div>
+      ${band?`<div class="target">Zielpuls ${band}</div>`:""}
+      <div class="next" style="max-width:320px">${c.regel}</div>
+    </div>
+    <div class="rbot"><button class="go" onclick="endCardio()">Fertig — Zeit eintragen</button></div>`;
+  tick = setInterval(()=>{
+    const el = Date.now()-run.t0, s2 = Math.floor(el/1000);
+    const c2 = document.getElementById("clk"); if(!c2){ clearInterval(tick); return }
+    c2.textContent = fmt(s2);
+    if(dur){ const p = Math.min(100, s2/(dur*60)*100);
+      R.querySelector(".rbar i").style.width = p+"%";
+      if(s2 >= dur*60 && !run.done){ run.done = true; buzz(); c2.classList.add("soon"); } }
+  },1000);
+}
+function endCardio(){
+  clearInterval(tick); tick=null;
+  const min = Math.round((Date.now()-run.t0)/60000);
+  if(min >= 5) logCardio(run.kind, min);
+  run=null; R.classList.add("hide"); document.body.style.overflow=""; render();
+}
+function logCardio(t, min){
+  cardioLog.push({d:iso(today()), t, min});
+  DB.set("cardio", cardioLog.slice(-120));
+}
+
+function startMob(){
+  const steps = [];
+  MOB.forEach((x,i) => {
+    steps.push({type:"hold", ex:x});
+    if(i < MOB.length-1) steps.push({type:"rest", sec:MOB_SWITCH, next:MOB[i+1]});
+  });
+  audio();
+  run = {mode:"mob", steps, i:0, t0:Date.now()};
+  R.classList.remove("hide"); document.body.style.overflow="hidden";
+  drawMob();
+}
+function drawMob(){
+  clearInterval(tick); tick=null;
+  if(run.i >= run.steps.length){
+    logCardio("mob", Math.max(1, Math.round((Date.now()-run.t0)/60000)));
+    clearInterval(tick); run=null; R.classList.add("hide");
+    document.body.style.overflow=""; render(); return;
+  }
+  const st = run.steps[run.i];
+  const pct = Math.round(run.i/run.steps.length*100);
+  const top = `<div class="rbar"><i style="width:${pct}%"></i></div>
+    <div class="rtop"><button class="eyebrow" onclick="endMob()">Beenden</button>
+      <span class="eyebrow num">Mobility · ${Math.ceil((run.i+1)/2)} von ${MOB.length}</span></div>`;
+  if(st.type === "hold"){
+    run.left = st.ex.sec;
+    R.innerHTML = top + `<div class="rmid">
+        <div class="exname" style="font-size:30px">${st.ex.n}</div>
+        <div class="clock" id="clk" style="font-size:60px;margin-top:10px">${fmt(st.ex.sec)}</div>
+        <div class="next" style="max-width:330px">${st.ex.c}</div>
+      </div>
+      <div class="rbot"><button class="go ghost" onclick="run.i++;drawMob()">Weiter</button></div>`;
+  } else {
+    run.left = st.sec;
+    R.innerHTML = top + `<div class="rmid">
+        <div class="lbl">Wechsel</div>
+        <div class="clock" id="clk">${fmt(st.sec)}</div>
+        <div class="next">Als Nächstes<br><b>${st.next.n}</b></div>
+      </div>
+      <div class="rbot"><button class="go ghost" onclick="run.i++;drawMob()">Weiter</button></div>`;
+  }
+  tick = setInterval(()=>{
+    run.left--;
+    const c = document.getElementById("clk");
+    if(!c){ clearInterval(tick); return }
+    c.textContent = fmt(run.left);
+    if(run.left <= 5) c.classList.add("soon");
+    if(run.left === 5 && st.type === "hold") warn();
+    if(run.left <= 0){ clearInterval(tick); buzz(); run.i++; drawMob(); }
+  },1000);
+}
+function endMob(){
+  clearInterval(tick); tick=null;
+  const min = Math.round((Date.now()-run.t0)/60000);
+  if(min >= 3) logCardio("mob", min);
+  run=null; R.classList.add("hide"); document.body.style.overflow=""; render();
+}
+
 function startRun(key){
-  run = {key, steps:buildSteps(key), i:0, left:0, t0:Date.now()};
+  audio();
+  run = {mode:"kraft", key, steps:buildSteps(key), i:0, left:0, t0:Date.now()};
   R.classList.remove("hide"); document.body.style.overflow="hidden";
   drawRun();
 }
@@ -536,6 +748,7 @@ function drawRun(){
       if(!c){ clearInterval(tick); return }
       c.textContent = fmt(run.left);
       if(run.left<=10) c.classList.add("soon");
+      if(run.left===5) warn();
       if(run.left<=0){ clearInterval(tick); buzz(); nextStep(); }
     },1000);
   }
@@ -554,17 +767,35 @@ function plates(){
   }
   box.textContent = `Pro Seite: ${out.join(" + ")}` + (side>0.05?` (+${side.toFixed(2)} kg fehlen)`:"");
 }
-function buzz(){
-  if(navigator.vibrate) navigator.vibrate([160,90,160]);
+let AC = null;
+function audio(){
   try{
-    const a = new (window.AudioContext||window.webkitAudioContext)();
-    const o = a.createOscillator(), g = a.createGain();
-    o.connect(g); g.connect(a.destination); o.frequency.value = 880;
-    g.gain.setValueAtTime(.001,a.currentTime);
-    g.gain.exponentialRampToValueAtTime(.25,a.currentTime+.02);
-    g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.45);
-    o.start(); o.stop(a.currentTime+.5);
-  }catch(e){}
+    if(!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if(AC.state === "suspended") AC.resume();
+    return AC;
+  }catch(e){ return null }
+}
+function tone(freq, dur, vol){
+  if(DB.get("mute", false)) return;
+  const a = audio(); if(!a) return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = "sine"; o.frequency.value = freq;
+  o.connect(g); g.connect(a.destination);
+  const t = a.currentTime;
+  g.gain.setValueAtTime(.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + .015);
+  g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.start(t); o.stop(t + dur + .03);
+}
+// 5 Sekunden vor Schluss: drei kurze Ticks — "gleich geht es weiter"
+function warn(){
+  [0, 150, 300].forEach(ms => setTimeout(() => tone(700, .09, .16), ms));
+  if(navigator.vibrate) navigator.vibrate(60);
+}
+// Pausenende: ein langer, deutlich höherer Ton
+function buzz(){
+  tone(940, .5, .28);
+  if(navigator.vibrate) navigator.vibrate([160, 90, 160]);
 }
 
 /* =======================================================================
@@ -579,6 +810,8 @@ function render(){
 }
 document.querySelectorAll("nav button").forEach(b=>
   b.onclick = ()=>go(b.dataset.tab));
+document.addEventListener("pointerdown", () => audio(), {once:true});
+document.addEventListener("visibilitychange", () => { if(!document.hidden) audio(); });
 render();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
