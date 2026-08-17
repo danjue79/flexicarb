@@ -53,6 +53,14 @@ h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.13em;
 .hr span{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--mute)}
 .hr.ghost{border:1px dashed var(--line);background:none;cursor:pointer}
 .hr.ghost b{color:var(--mute);font-size:15px}
+.hrlive{margin-top:18px;padding:12px 22px;border-radius:14px;border:1px solid var(--line);
+  min-width:150px;background:var(--surf)}
+.hrlive b{display:block;font-family:var(--data);font-size:40px;font-weight:600;line-height:1}
+.hrlive span{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--mute)}
+.hrlive.off b{color:var(--mute);font-size:30px}
+.hrlive.in{border-color:var(--mint)} .hrlive.in b{color:var(--mint)}
+.hrlive.low{border-color:var(--line)} .hrlive.low b{color:var(--chalk)}
+.hrlive.high{border-color:var(--rose)} .hrlive.high b{color:var(--rose)}
 .macros{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
   background:var(--line);border-radius:12px;overflow:hidden;margin-top:14px}
 .macro{background:var(--surf);padding:11px 6px;text-align:center}
@@ -89,6 +97,17 @@ h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.13em;
 .clock.soon{color:var(--amber)}
 .next{font-size:14px;color:var(--mute);margin-top:18px}
 .next b{color:var(--chalk);font-weight:600}
+.queue{margin-top:22px;max-width:340px;font-size:11.5px;line-height:1.8;
+  color:var(--mute);letter-spacing:.02em}
+.queue .qlbl{text-transform:uppercase;letter-spacing:.14em;font-size:9.5px;opacity:.55;margin-right:7px}
+.queue em{font-style:normal;opacity:.7}
+.queue .sep{margin:0 6px;opacity:.45}
+.queue .last-item{font-style:italic;opacity:.7}
+.wl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mint);opacity:.75}
+.vol{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surf2);
+  border-radius:11px;padding:4px;margin-top:12px}
+.vol button{padding:9px;border-radius:8px;font-size:13px;color:var(--mute)}
+.vol button.on{background:var(--surf);color:var(--chalk);font-weight:600}
 .rbot{padding:0 18px 16px;display:grid;gap:9px}
 .logrow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .field{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
@@ -97,6 +116,14 @@ h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.13em;
 .field input{width:100%;background:none;border:none;outline:none;color:var(--chalk);
   font-family:var(--data);font-size:21px;font-weight:600}
 .last{font-size:12px;color:var(--mute);text-align:center}
+.skip{width:100%;padding:13px;font-size:14px;color:var(--mute);
+  border:1px solid var(--line);border-radius:12px;background:none}
+.sheet{flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 22px}
+.reason{display:block;width:100%;text-align:left;background:var(--surf);
+  border:1px solid var(--line);border-radius:13px;padding:15px 16px;
+  margin-bottom:9px;font-size:15.5px}
+.reason:active{background:var(--surf2)}
+.reason.warn{border-color:rgba(233,115,107,.45);color:var(--rose)}
 
 /* ---------- meals ---------- */
 .meal{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -269,7 +296,17 @@ const isTrain = () => !!dayKey();
 const age = () => DB.get("age", null);
 const hrMax = () => { const a = age(); return a ? Math.round(208 - 0.7*a) : null; };
 const hrBand = pct => { const m = hrMax(); return m ? `${Math.round(m*pct[0])}–${Math.round(m*pct[1])} S/min` : null; };
-const cardioLog = DB.get("cardio", []);   // [{d, t:"zone2"|"int"|"mob", min}]
+const cardioLog = DB.get("cardio", []);
+const skipLog   = DB.get("skips", []);    // [{d, k, ex, reason, sets}]
+const REASONS = [
+  {id:"schmerz", t:"Schmerz / Beschwerden", warn:true},
+  {id:"belegt",  t:"Gerät oder Bank belegt"},
+  {id:"zeit",    t:"Zeit reicht nicht"},
+  {id:"kraft",   t:"Keine Kraft mehr"},
+  {id:"ersetzt", t:"Durch andere Übung ersetzt"},
+  {id:"sonst",   t:"Anderer Grund"}
+];
+const REASON_T = Object.fromEntries(REASONS.map(r => [r.id, r.t]));   // [{d, t:"zone2"|"int"|"mob", min}]
 const DAYNAME = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
 
 /* =======================================================================
@@ -371,6 +408,10 @@ function viewPlan(){
     </div>`;
   }
   if(!hrMax()) h += `<div class="card"><button class="go ghost" onclick="askAge()">Alter eintragen — dann rechne ich die Pulszonen aus</button></div>`;
+  h += `<div class="card"><div class="eyebrow">Pulsgurt</div>
+    <p class="muted" style="font-size:13.5px;margin-top:8px">${hasBLE()
+      ? "Dieser Browser kann Bluetooth-Pulsgurte lesen. Der Knopf dazu erscheint in der Ausdauer-Ansicht."
+      : "Safari auf dem iPhone kann keine Bluetooth-Geräte lesen — das ist eine Apple-Einschränkung, keine der App. Nach jeder Ausdauereinheit fragt die App stattdessen nach dem Durchschnittspuls; den zeigt dir deine Uhr im Nachhinein an."}</p></div>`;
 
   // Mobility
   h += `<h2>Mobility — Donnerstag</h2><div class="card">`;
@@ -432,6 +473,15 @@ function viewWerte(){
       <p class="muted" style="font-size:13px;margin-top:12px">Nur den Schnitt bewerten, nie Einzelwerte.
       Ziel: −0,2 bis −0,4 kg pro Woche. Bleibt das Gewicht stabil, während die Gewichte im Log steigen — genau das ist Rekomposition.</p>
     </div>`;
+  const recent = cardioLog.map((x,i)=>({...x,i})).filter(x => x.t !== "mob").slice(-8).reverse();
+  if(recent.length){
+    const NM = {zone2:"Zone 2", int:"Intervalle"};
+    h += `<h2>Ausdauer</h2><div class="card">` + recent.map(x =>
+      `<div class="wrow"><span class="muted">${new Date(x.d).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})} · ${NM[x.t]||x.t} · ${x.min} min</span>` +
+      (x.hr ? `<span class="num">${x.hr} S/min</span>`
+            : `<button class="num" style="color:var(--amber);font-size:13px" onclick="addHR(${x.i})">Puls +</button>`) +
+      `</div>`).join("") + `</div>`;
+  }
   h += `<h2>Ton</h2><div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
         <div><b style="font-size:15px">Signaltöne</b><br>
@@ -439,6 +489,10 @@ function viewWerte(){
         <button class="go ghost" style="width:auto;padding:11px 16px;margin:0"
           onclick="toggleMute()">${DB.get("mute",false)?"Aus":"An"}</button>
       </div>
+      <div class="vol">${["leise","mittel","laut"].map(v =>
+        `<button class="${DB.get("vol","mittel")===v?"on":""}" onclick="setVol('${v}')">${v}</button>`).join("")}</div>
+      <p class="muted" style="font-size:12.5px;margin-top:10px">Läuft Musik, senkt iOS sie für den Signalton kurz ab.
+      Falls trotzdem nichts kommt: Stummschalter am Gehäuse prüfen — der schaltet auch Töne im Browser stumm.</p>
       <button class="go ghost" style="margin-top:10px" onclick="audio();warn();setTimeout(buzz,900)">Töne anhören</button>
     </div>`;
   h += `<h2>Bericht</h2><div class="card">
@@ -521,9 +575,29 @@ function buildReport(){
     const NM = {zone2:"Zone 2", int:"Intervalle", mob:"Mobility"};
     ["zone2","int","mob"].forEach(k => {
       const r2 = rec.filter(x => x.t===k);
-      if(r2.length) L.push(`${NM[k]}: ${r2.length} ${r2.length===1?"Einheit":"Einheiten"}, ${r2.reduce((a,b)=>a+b.min,0)} Minuten gesamt`);
+      if(!r2.length) return;
+      const withHR = r2.filter(x => x.hr);
+      const hrTxt = withHR.length
+        ? ` — Ø Puls ${Math.round(withHR.reduce((a,b)=>a+b.hr,0)/withHR.length)} S/min`
+          + (withHR.length > 2 ? ` (erste ${withHR[0].hr} → letzte ${withHR[withHR.length-1].hr})` : "")
+        : "";
+      L.push(`${NM[k]}: ${r2.length} ${r2.length===1?"Einheit":"Einheiten"}, ${r2.reduce((a,b)=>a+b.min,0)} Minuten gesamt${hrTxt}`);
     });
   } else L.push("nichts protokolliert");
+  L.push("");
+
+  L.push("ÜBERSPRUNGEN (letzte 4 Wochen)");
+  const sk = skipLog.filter(x => new Date(x.d) >= cut);
+  if(sk.length){
+    const byEx = {};
+    sk.forEach(x => { (byEx[x.ex] = byEx[x.ex] || []).push(x) });
+    Object.entries(byEx).sort((a,b) => b[1].length - a[1].length).forEach(([ex, list]) => {
+      const cnt = {};
+      list.forEach(x => cnt[x.reason] = (cnt[x.reason]||0) + 1);
+      const txt = Object.entries(cnt).map(([r,c]) => `${REASON_T[r]||r}${c>1?" "+c+"×":""}`).join(", ");
+      L.push(`${ex}: ${list.length}× ausgelassen (${txt})`);
+    });
+  } else L.push("nichts ausgelassen");
   L.push("");
   L.push("SUBJEKTIV (bitte ausfüllen)");
   L.push("Energie im Training: ");
@@ -547,7 +621,12 @@ function showReport(txt){
   if(box){ box.classList.remove("hide"); box.value = txt; box.select(); }
 }
 
+function addHR(idx){
+  const v = parseInt(prompt("Durchschnittspuls dieser Einheit?") || "");
+  if(v > 40 && v < 230){ cardioLog[idx].hr = v; DB.set("cardio", cardioLog); render(); }
+}
 function toggleMute(){ DB.set("mute", !DB.get("mute", false)); render(); }
+function setVol(v){ DB.set("vol", v); audio(); tone(700,.12,.16); render(); }
 
 function addWeight(){
   const el = document.getElementById("wIn");
@@ -581,10 +660,76 @@ function buildSteps(key){
   return steps;
 }
 
+let WL = null;
+async function keepAwake(on){
+  try{
+    if(on){
+      if(!WL && "wakeLock" in navigator){
+        WL = await navigator.wakeLock.request("screen");
+        WL.addEventListener("release", () => { WL = null; });
+      }
+    } else if(WL){ await WL.release(); WL = null; }
+  }catch(e){ WL = null }
+}
+// iOS gibt die Sperre beim Wegschalten frei — beim Zurückkommen neu anfordern
+document.addEventListener("visibilitychange", () => {
+  if(!document.hidden && run) keepAwake(true);
+});
+
+/* ---------- Pulsgurt ----------
+   Standard-BLE-Profil: Service "heart_rate" (0x180D),
+   Characteristic "heart_rate_measurement" (0x2A37).
+   Jeder normgerechte Brustgurt und die meisten Uhren senden darüber.
+   navigator.bluetooth gibt es in Safari auf dem iPhone nicht — die
+   Knöpfe erscheinen daher nur, wo die Schnittstelle vorhanden ist. */
+const hasBLE = () => typeof navigator !== "undefined" && !!navigator.bluetooth;
+let HR = {dev:null, chr:null, bpm:null, samples:[]};
+
+async function connectHR(){
+  if(!hasBLE()) return;
+  try{
+    const dev = await navigator.bluetooth.requestDevice({filters:[{services:["heart_rate"]}]});
+    const srv = await dev.gatt.connect();
+    const svc = await srv.getPrimaryService("heart_rate");
+    const chr = await svc.getCharacteristic("heart_rate_measurement");
+    await chr.startNotifications();
+    chr.addEventListener("characteristicvaluechanged", e => {
+      const v = e.target.value, flags = v.getUint8(0);
+      // Bit 0 der Flags: 0 = 8-Bit-Wert, 1 = 16-Bit-Wert
+      HR.bpm = (flags & 1) ? v.getUint16(1, true) : v.getUint8(1);
+      if(run && run.mode === "cardio") HR.samples.push(HR.bpm);
+      paintHR();
+    });
+    dev.addEventListener("gattserverdisconnected", () => { HR.bpm = null; paintHR() });
+    HR.dev = dev; HR.chr = chr;
+    paintHR();
+  }catch(e){ /* Nutzer hat abgebrochen oder kein Gerät gefunden */ }
+}
+function disconnectHR(){
+  try{ HR.chr && HR.chr.stopNotifications(); HR.dev && HR.dev.gatt.disconnect(); }catch(e){}
+  HR = {dev:null, chr:null, bpm:null, samples:[]};
+}
+function hrZoneState(bpm){
+  if(!run || run.mode !== "cardio") return "";
+  const p = CARDIO[run.kind].pct, m = hrMax();
+  if(!m || !bpm) return "";
+  if(bpm < m*p[0]) return "low";
+  if(bpm > m*p[1]) return "high";
+  return "in";
+}
+function paintHR(){
+  const el = document.getElementById("hrLive"); if(!el) return;
+  if(HR.bpm == null){ el.className = "hrlive off"; el.innerHTML = `<b>—</b><span>kein Signal</span>`; return }
+  const st = hrZoneState(HR.bpm);
+  const txt = {low:"zu langsam", in:"in der Zone", high:"zu schnell"}[st] || "Puls";
+  el.className = "hrlive " + st;
+  el.innerHTML = `<b>${HR.bpm}</b><span>${txt}</span>`;
+}
+
 function startCardio(kind, min){
   const c = CARDIO[kind], band = hrBand(c.pct);
   const dur = min || (kind==="int" ? 0 : 40);
-  audio();
+  audio(); keepAwake(true);
   run = {mode:"cardio", kind, dur, t0:Date.now(), left: dur*60};
   R.classList.remove("hide"); document.body.style.overflow="hidden";
   R.innerHTML = `<div class="rbar"><i style="width:0%"></i></div>
@@ -594,9 +739,13 @@ function startCardio(kind, min){
       <div class="lbl">${dur?"Zielzeit "+dur+" min":"Freie Dauer"}</div>
       <div class="clock" id="clk">0:00</div>
       ${band?`<div class="target">Zielpuls ${band}</div>`:""}
+      <div class="hrlive off" id="hrLive"><b>—</b><span>kein Signal</span></div>
       <div class="next" style="max-width:320px">${c.regel}</div>
     </div>
-    <div class="rbot"><button class="go" onclick="endCardio()">Fertig — Zeit eintragen</button></div>`;
+    <div class="rbot">
+      ${hasBLE()?`<button class="skip" onclick="${HR.dev?"disconnectHR()":"connectHR()"}">${HR.dev?"Pulsgurt trennen":"Pulsgurt verbinden"}</button>`:""}
+      <button class="go" onclick="endCardio()">Fertig — Zeit eintragen</button></div>`;
+  paintHR();
   tick = setInterval(()=>{
     const el = Date.now()-run.t0, s2 = Math.floor(el/1000);
     const c2 = document.getElementById("clk"); if(!c2){ clearInterval(tick); return }
@@ -607,13 +756,44 @@ function startCardio(kind, min){
   },1000);
 }
 function endCardio(){
-  clearInterval(tick); tick=null;
-  const min = Math.round((Date.now()-run.t0)/60000);
-  if(min >= 5) logCardio(run.kind, min);
-  run=null; R.classList.add("hide"); document.body.style.overflow=""; render();
+  clearInterval(tick); tick = null;
+  const min = Math.round((Date.now() - run.t0) / 60000);
+  const kind = run.kind;
+  if(min < 5){                              // zu kurz: nichts protokollieren
+    HR.samples = []; keepAwake(false); run = null;
+    R.classList.add("hide"); document.body.style.overflow = ""; render(); return;
+  }
+  let hr = null, hrmax = null;
+  if(HR.samples.length){                    // Pulsgurt hat gemessen
+    hr = Math.round(HR.samples.reduce((a,b)=>a+b,0) / HR.samples.length);
+    hrmax = Math.max(...HR.samples);
+  }
+  run = {mode:"cardioEnd", kind, min, hr, hrmax, t0:run.t0};
+  const m = hrMax(), band = hrBand(CARDIO[kind].pct);
+  R.innerHTML = `<div class="rtop"><span class="eyebrow">${CARDIO[kind].name} beendet</span></div>
+    <div class="sheet">
+      <div class="exname" style="font-size:30px">${min} Minuten</div>
+      ${hr ? `<div class="hrlive in" style="margin:18px 0"><b>${hr}</b><span>Ø Puls gemessen${hrmax?` · Spitze ${hrmax}`:""}</span></div>`
+           : `<p class="muted" style="font-size:14px;margin:16px 0 4px">Durchschnittspuls dieser Einheit?
+              Deine Uhr zeigt ihn nach dem Beenden der Aufzeichnung an. Feld leer lassen, wenn du nicht gemessen hast.</p>
+              <div class="field"><label>Ø Puls (S/min)${band?" · Ziel "+band:""}</label>
+                <input id="hrIn" type="number" inputmode="numeric" placeholder="—"></div>`}
+      <button class="go" style="margin-top:18px" onclick="saveCardio()">Speichern</button>
+      <p class="muted" style="font-size:12px;margin-top:14px">Gleiche Belastung bei sinkendem Puls über die Wochen ist der sauberste Beleg für bessere Ausdauer — unabhängig von der Waage.</p>
+    </div>`;
 }
-function logCardio(t, min){
-  cardioLog.push({d:iso(today()), t, min});
+function saveCardio(){
+  let hr = run.hr;
+  if(!hr){
+    const v = parseInt((document.getElementById("hrIn")?.value || "").trim());
+    if(v > 40 && v < 230) hr = v;
+  }
+  logCardio(run.kind, run.min, hr, run.hrmax);
+  HR.samples = []; keepAwake(false); run = null;
+  R.classList.add("hide"); document.body.style.overflow = ""; render();
+}
+function logCardio(t, min, hr, hrmax){
+  cardioLog.push({d:iso(today()), t, min, ...(hr?{hr}:{}), ...(hrmax?{hrmax}:{})});
   DB.set("cardio", cardioLog.slice(-120));
 }
 
@@ -623,7 +803,7 @@ function startMob(){
     steps.push({type:"hold", ex:x});
     if(i < MOB.length-1) steps.push({type:"rest", sec:MOB_SWITCH, next:MOB[i+1]});
   });
-  audio();
+  audio(); keepAwake(true);
   run = {mode:"mob", steps, i:0, t0:Date.now()};
   R.classList.remove("hide"); document.body.style.overflow="hidden";
   drawMob();
@@ -632,7 +812,7 @@ function drawMob(){
   clearInterval(tick); tick=null;
   if(run.i >= run.steps.length){
     logCardio("mob", Math.max(1, Math.round((Date.now()-run.t0)/60000)));
-    clearInterval(tick); run=null; R.classList.add("hide");
+    clearInterval(tick); run=null; keepAwake(false); R.classList.add("hide");
     document.body.style.overflow=""; render(); return;
   }
   const st = run.steps[run.i];
@@ -646,6 +826,7 @@ function drawMob(){
         <div class="exname" style="font-size:30px">${st.ex.n}</div>
         <div class="clock" id="clk" style="font-size:60px;margin-top:10px">${fmt(st.ex.sec)}</div>
         <div class="next" style="max-width:330px">${st.ex.c}</div>
+        ${queueHTML(run.i+1)}
       </div>
       <div class="rbot"><button class="go ghost" onclick="run.i++;drawMob()">Weiter</button></div>`;
   } else {
@@ -671,17 +852,68 @@ function endMob(){
   clearInterval(tick); tick=null;
   const min = Math.round((Date.now()-run.t0)/60000);
   if(min >= 3) logCardio("mob", min);
-  run=null; R.classList.add("hide"); document.body.style.overflow=""; render();
+  keepAwake(false); run=null; R.classList.add("hide"); document.body.style.overflow=""; render();
+}
+
+// Nächster noch nicht übersprungener Satz ab Position from
+function nextSet(from){
+  for(let j = from; j < run.steps.length; j++){
+    const st = run.steps[j];
+    if(st.type === "set" && !run.skip.has(st.ex.n)) return st.ex;
+  }
+  return null;
+}
+// Zeiger vorrücken, bis er auf etwas Sinnvollem steht
+function advance(){
+  while(run.i < run.steps.length){
+    const st = run.steps[run.i];
+    if(st.type === "set" && run.skip.has(st.ex.n)){ run.i++; continue }
+    if(st.type === "rest" && !nextSet(run.i + 1)){ run.i++; continue }
+    break;
+  }
+}
+function askSkip(){
+  clearInterval(tick); tick = null;
+  const st = run.steps[run.i];
+  const rest = run.steps.filter((x,j) => j >= run.i && x.type === "set" && x.ex.n === st.ex.n).length;
+  R.innerHTML = `<div class="rtop"><button class="eyebrow" onclick="drawRun()">Zurück</button>
+      <span class="eyebrow">Überspringen</span></div>
+    <div class="sheet">
+      <div class="exname" style="font-size:24px;margin-bottom:4px">${st.ex.n}</div>
+      <p class="muted" style="font-size:13.5px;margin-bottom:18px">Noch ${rest} ${rest===1?"Satz":"Sätze"} offen. Warum?</p>
+      ${REASONS.map(r => `<button class="reason${r.warn?" warn":""}" onclick="doSkip('${r.id}')">${r.t}</button>`).join("")}
+      <p class="muted" style="font-size:12px;margin-top:16px">Der Grund landet im Bericht — daraus lässt sich erkennen, ob der Plan angepasst werden muss.</p>
+    </div>`;
+}
+function doSkip(reason){
+  const st = run.steps[run.i];
+  const rest = run.steps.filter((x,j) => j >= run.i && x.type === "set" && x.ex.n === st.ex.n).length;
+  skipLog.push({d:iso(today()), k:run.key, ex:st.ex.n, reason, sets:rest});
+  DB.set("skips", skipLog.slice(-200));
+  run.skip.add(st.ex.n);
+  if(reason === "schmerz"){
+    R.innerHTML = `<div class="rtop"><span class="eyebrow">Notiert</span></div>
+      <div class="sheet">
+        <div class="exname" style="font-size:22px">Beschwerden ernst nehmen</div>
+        <p class="muted" style="font-size:14px;margin-top:14px">Richtig, die Übung heute auszulassen.
+        Bei Schmerz gilt: nicht durchziehen und nicht in der nächsten Einheit einfach wieder probieren.
+        Halten die Beschwerden über mehr als zwei Einheiten an oder strahlen sie aus, gehört das ärztlich abgeklärt —
+        nicht in einen Trainingsplan.</p>
+        <button class="go" style="margin-top:20px" onclick="run.i++;advance();drawRun()">Weiter</button>
+      </div>`;
+    return;
+  }
+  run.i++; advance(); drawRun();
 }
 
 function startRun(key){
-  audio();
-  run = {mode:"kraft", key, steps:buildSteps(key), i:0, left:0, t0:Date.now()};
+  audio(); keepAwake(true);
+  run = {mode:"kraft", key, steps:buildSteps(key), i:0, left:0, t0:Date.now(), skip:new Set()};
   R.classList.remove("hide"); document.body.style.overflow="hidden";
   drawRun();
 }
 function endRun(){
-  clearInterval(tick); tick=null; run=null;
+  clearInterval(tick); tick=null; run=null; keepAwake(false);
   R.classList.add("hide"); document.body.style.overflow=""; render();
 }
 function nextStep(){
@@ -700,18 +932,20 @@ function nextStep(){
       if(!done.some(x => x.d===d && x.k===run.key)){ done.push({d, k:run.key}); DB.set("done", done); }
     }
   }
-  run.i++;
+  run.i++; advance();
   if(run.i >= run.steps.length){ endRun(); return }
   drawRun();
 }
 function drawRun(){
   clearInterval(tick); tick=null;
+  advance();
+  if(run.i >= run.steps.length){ endRun(); return }
   const st = run.steps[run.i];
   const pct = Math.round(run.i/run.steps.length*100);
   const mins = Math.floor((Date.now()-run.t0)/60000);
   const top = `<div class="rbar"><i style="width:${pct}%"></i></div>
     <div class="rtop"><button class="eyebrow" onclick="endRun()">Beenden</button>
-      <span class="eyebrow num">${mins} min · Einheit ${run.key}</span></div>`;
+      <span class="eyebrow num">${mins} min · Einheit ${run.key}${WL?' <span class="wl">· Display an</span>':''}</span></div>`;
 
   if(st.type==="set"){
     const l = lifts[st.ex.n];
@@ -719,6 +953,7 @@ function drawRun(){
         <div class="lbl">Paar ${st.pair} · Runde ${st.round} von ${st.rounds}</div>
         <div class="exname">${st.ex.n}</div>
         <div class="target">${st.ex.t}</div>
+        ${queueHTML(run.i+1)}
       </div>
       <div class="rbot">
         <div class="logrow">
@@ -732,6 +967,7 @@ function drawRun(){
         ${l?`<div class="last">zuletzt ${l.w} kg × ${l.r}</div>`
             :`<div class="last">Startvorschlag ${st.ex.k==="db"?"2 × "+st.ex.w+" kg":st.ex.w+" kg"} — im ersten Satz prüfen, ob 2 Wdh. übrig bleiben</div>`}
         <button class="go" onclick="nextStep()">Satz fertig</button>
+        <button class="skip" onclick="askSkip()">Übung überspringen</button>
       </div>`;
     plates();
   } else {
@@ -739,7 +975,8 @@ function drawRun(){
     R.innerHTML = top + `<div class="rmid">
         <div class="lbl">${st.sec<=SWITCH?"Wechsel":"Pause"}</div>
         <div class="clock" id="clk">${fmt(st.sec)}</div>
-        <div class="next">Als Nächstes<br><b>${st.next.n}</b></div>
+        <div class="next">Als Nächstes<br><b>${(nextSet(run.i+1)||{n:"—"}).n}</b></div>
+        ${queueHTML(run.i+1)}
       </div>
       <div class="rbot"><button class="go ghost" onclick="nextStep()">Weiter</button></div>`;
     tick = setInterval(()=>{
@@ -754,6 +991,36 @@ function drawRun(){
   }
 }
 const fmt = s => (s<0?0:Math.floor(s/60))+":"+String(Math.max(0,s)%60).padStart(2,"0");
+
+// Restliche Sätze ab Position i — nach Übung zusammengefasst.
+// Bei Supersätzen wechselt die Reihenfolge ständig; jeder Satz einzeln
+// aufgelistet wäre in kleiner Schrift unlesbar.
+function queue(from){
+  const out = [], idx = {};
+  for(let j = from; j < run.steps.length; j++){
+    const st = run.steps[j];
+    if(st.type !== "set" && st.type !== "hold") continue;
+    const n = st.ex.n;
+    if(run.skip && run.skip.has(n)) continue;
+    if(idx[n] === undefined){ idx[n] = out.length; out.push({n, c:1}); }
+    else out[idx[n]].c++;
+  }
+  return out;
+}
+function short(n){
+  return n.replace(/ \((Langhantel|KH)\)/, "")
+          .replace("Rumänisches", "Rum.")
+          .replace("Schrägbankdrücken", "Schrägbank")
+          .replace("Schulterdrücken stehend", "Schulterdrücken")
+          .replace("Bulgarian Split Squat", "Split Squat");
+}
+function queueHTML(from){
+  const q = queue(from);
+  if(!q.length) return `<div class="queue"><span class="last-item">letzter Satz der Einheit</span></div>`;
+  return `<div class="queue"><span class="qlbl">Danach</span>` + q.map(x =>
+    `<span>${short(x.n)}${x.c > 1 ? ` <em>×${x.c}</em>` : ""}</span>`
+  ).join('<span class="sep">·</span>') + `</div>`;
+}
 const BAR = {bar:20, trap:25};
 function plates(){
   const box = document.getElementById("plt"); if(!box || !run) return;
@@ -768,9 +1035,16 @@ function plates(){
   box.textContent = `Pro Seite: ${out.join(" + ")}` + (side>0.05?` (+${side.toFixed(2)} kg fehlen)`:"");
 }
 let AC = null;
+const VOLS = {leise:.20, mittel:.45, laut:.90};
 function audio(){
   try{
-    if(!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if(!AC){
+      // Muss VOR dem Anlegen des Kontexts gesetzt werden.
+      // "transient" = kurzer Signalton, der laufende Musik anduckt
+      // statt sie zu unterbrechen oder selbst stumm zu bleiben.
+      if(navigator.audioSession) navigator.audioSession.type = "transient";
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+    }
     if(AC.state === "suspended") AC.resume();
     return AC;
   }catch(e){ return null }
@@ -778,14 +1052,20 @@ function audio(){
 function tone(freq, dur, vol){
   if(DB.get("mute", false)) return;
   const a = audio(); if(!a) return;
-  const o = a.createOscillator(), g = a.createGain();
-  o.type = "sine"; o.frequency.value = freq;
-  o.connect(g); g.connect(a.destination);
-  const t = a.currentTime;
-  g.gain.setValueAtTime(.0001, t);
-  g.gain.exponentialRampToValueAtTime(vol, t + .015);
-  g.gain.exponentialRampToValueAtTime(.0001, t + dur);
-  o.start(t); o.stop(t + dur + .03);
+  const lvl = VOLS[DB.get("vol","mittel")] ?? VOLS.mittel;
+  const bus = a.createGain(); bus.connect(a.destination);
+  const t = a.currentTime, peak = Math.min(.95, vol * lvl * 2.2);
+  bus.gain.setValueAtTime(.0001, t);
+  bus.gain.exponentialRampToValueAtTime(peak, t + .012);
+  bus.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  // Grundton als Rechteck + Oktave als Sinus: setzt sich gegen Musik durch,
+  // weil die Obertöne in einem anderen Frequenzband liegen als der Bass.
+  [[freq, "square", 1], [freq*2, "sine", .45]].forEach(([f, type, m]) => {
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.value = f; g.gain.value = m;
+    o.connect(g); g.connect(bus);
+    o.start(t); o.stop(t + dur + .04);
+  });
 }
 // 5 Sekunden vor Schluss: drei kurze Ticks — "gleich geht es weiter"
 function warn(){
