@@ -138,6 +138,71 @@ h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.13em;
 .shift .eyebrow{flex:1 0 100%;margin-bottom:2px}
 .shift button{border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13px;color:var(--mute)}
 .card.dl{border-color:var(--amber);background:rgba(242,160,61,.08)}
+.habits{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
+.hb{background:var(--surf2);border:1px solid var(--line);border-radius:13px;
+  padding:11px 3px 9px;text-align:center}
+.hb i{display:block;font-style:normal;font-size:15px;height:19px;line-height:19px;color:transparent}
+.hb b{display:block;font-size:12.5px;font-weight:600}
+.hb span{font-size:9.5px;color:var(--mute);letter-spacing:.03em}
+.hb.on{background:rgba(95,211,168,.14);border-color:var(--mint)}
+.hb.on i{color:var(--mint)}
+.hb.on b{color:var(--mint)}
+.hrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.hrow:last-of-type{border:none}
+.hmeta{width:74px;flex:none}
+.hmeta b{display:block;font-size:13.5px;font-weight:600}
+.hmeta span{font-size:10px;color:var(--mute)}
+.hdots{flex:1;display:flex;gap:2px;align-items:center}
+.hdots i{flex:1;height:15px;border-radius:2px;background:var(--surf2)}
+.hdots i.on{background:var(--mint)}
+.hdots i.off{background:var(--line)}
+.hdots i.na{background:transparent;border:1px solid var(--surf2)}
+.hpct{width:52px;flex:none;text-align:right;font-family:var(--data);font-size:14px;font-weight:600}
+.hpct em{display:block;font-style:normal;font-size:9px;color:var(--mute);font-weight:400}
+.hpct.good{color:var(--mint)} .hpct.mid{color:var(--amber)} .hpct.low{color:var(--rose)}
+#hist{position:fixed;inset:0;background:var(--ink);z-index:60;display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top,0) 0 var(--safe-b)}
+.histbody{flex:1;overflow-y:auto;padding:0 18px 30px;max-width:560px;margin:0 auto;width:100%}
+.histseg{grid-template-columns:repeat(5,1fr);gap:3px}
+.histseg button{padding:9px 2px;font-size:11px;letter-spacing:.04em}
+#hist h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.13em;
+  font-size:12px;color:var(--mute);font-weight:600;margin:24px 0 10px}
+.cal{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:11px 12px}
+.calhead,.calrow{display:grid;grid-template-columns:42px repeat(7,1fr);gap:4px;align-items:center}
+.calhead{margin-bottom:6px}
+.calhead span{text-align:center;font-size:9.5px;letter-spacing:.09em;color:var(--mute);
+  text-transform:uppercase;font-family:var(--disp);font-weight:600}
+.calrow{margin-bottom:4px}
+.wk{font-family:var(--data);font-size:9.5px;color:var(--mute)}
+.cell{height:26px;border-radius:5px;background:var(--surf2);display:flex;align-items:center;
+  justify-content:center;font-family:var(--data);font-size:11px;color:var(--mute);cursor:pointer}
+.cell.na{background:none;border:1px solid rgba(51,73,95,.35);cursor:default}
+.cell.on{background:var(--mint)}
+.cell.off{background:var(--line)}
+.cell.empty{background:var(--surf2)}
+.cell.s0{background:var(--surf2)}
+.cell.s1{background:rgba(95,211,168,.22);color:var(--chalk)}
+.cell.s2{background:rgba(95,211,168,.42);color:var(--chalk)}
+.cell.s3{background:rgba(95,211,168,.66);color:#14202C}
+.cell.s4{background:var(--mint);color:#14202C;font-weight:700}
+.cell.pick{outline:2px solid var(--amber);outline-offset:1px}
+.wdbars,.wtrend{display:flex;gap:5px;align-items:flex-end;background:var(--surf);
+  border:1px solid var(--line);border-radius:14px;padding:12px}
+.wdb,.wt{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.wdb i,.wt i{width:100%;background:var(--mint);border-radius:3px;opacity:.85;min-height:4px}
+.wdbars{height:132px} .wtrend{height:120px}
+.wdb{height:100%;justify-content:flex-end} .wt{height:100%;justify-content:flex-end}
+.wdb i.worst{background:var(--rose)}
+.wdb b,.wt span{font-size:10px;color:var(--mute);font-weight:600;font-family:var(--data)}
+.wdb span{font-size:9px;color:var(--mute)}
+.hint{font-size:12.5px;color:var(--mute);margin-top:10px;line-height:1.55}
+.hint b{color:var(--chalk)}
+.ovw{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.ov{background:var(--surf);border:1px solid var(--line);border-radius:13px;
+  padding:14px 4px;text-align:center;cursor:pointer}
+.ov b{display:block;font-family:var(--data);font-size:19px;font-weight:600}
+.ov span{font-size:10px;color:var(--mute)}
+.ov.good b{color:var(--mint)} .ov.mid b{color:var(--amber)} .ov.low b{color:var(--rose)}
 
 /* ---------- meals ---------- */
 .meal{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -188,6 +253,7 @@ nav button i{display:block;font-size:19px;font-style:normal;margin-bottom:2px;op
 </nav>
 
 <div id="runner" class="hide"></div>
+<div id="hist" class="hide"></div>
 
 <script>
 /* =======================================================================
@@ -311,7 +377,76 @@ const age = () => DB.get("age", null);
 const hrMax = () => { const a = age(); return a ? Math.round(208 - 0.7*a) : null; };
 const hrBand = pct => { const m = hrMax(); return m ? `${Math.round(m*pct[0])}–${Math.round(m*pct[1])} S/min` : null; };
 const cardioLog = DB.get("cardio", []);   // [{d, t, min, hr}]
-const skipLog   = DB.get("skips", []);    // [{d, k, ex, reason, sets}]
+const skipLog   = DB.get("skips", []);
+const habits    = DB.get("habits", {});   // {"2026-08-18": {p:1,s:1,k:0,g:1}}
+/* Bewusst nur vier — und keine, die die App ohnehin mitschreibt
+   (Training, Ausdauer, Mobility, Gewicht stehen schon in den Logs). */
+const HABITS = [
+  {id:"p", t:"Protein",  z:"185 g+",     lang:"Protein-Ziel erreicht"},
+  {id:"s", t:"Schlaf",   z:"7 h+",       lang:"Mindestens 7 Stunden geschlafen"},
+  {id:"k", t:"Stärke",   z:"nach Plan",  lang:"Kohlenhydrate nach Flexi-Carb-Plan"},
+  {id:"g", t:"Schritte", z:"8.000+",     lang:"8.000 Schritte oder mehr"}
+];
+function habitDay(d){ return habits[d] || {} }
+function toggleHabit(id, d){
+  const day = habits[d] || (habits[d] = {});
+  day[id] = day[id] ? 0 : 1;
+  DB.set("habits", habits); render();
+}
+// Quote der letzten n Tage — bewusst keine Serie, siehe Erläuterung im Chat
+function habitRate(id, n){
+  const out = {done:0, total:0};
+  for(let i = 0; i < n; i++){
+    const dt = new Date(today()); dt.setDate(dt.getDate() - i);
+    const k = iso(dt);
+    if(new Date(k) < new Date(firstHabitDay())) continue;
+    out.total++; if(habitDay(k)[id]) out.done++;
+  }
+  return out;
+}
+const WD = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+const mondayOf = d => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay()+6)%7)); return x };
+
+// Wochenblöcke vom ersten erfassten Tag bis heute, jeweils Mo–So
+function histWeeks(){
+  const first = mondayOf(new Date(firstHabitDay()));
+  const last  = mondayOf(today());
+  const out = [];
+  for(let m = new Date(first); m <= last; m.setDate(m.getDate()+7)){
+    const days = [];
+    for(let i = 0; i < 7; i++){
+      const d = new Date(m); d.setDate(m.getDate()+i);
+      days.push({k: iso(d), future: d > today(), before: iso(d) < firstHabitDay()});
+    }
+    out.push({mon: new Date(m), days});
+  }
+  return out.slice(-12);
+}
+// Quote je Wochentag — zeigt, wo es systematisch bricht
+function weekdayRate(id){
+  const acc = WD.map(() => ({done:0, total:0}));
+  Object.keys(habits).forEach(k => {
+    const i = (new Date(k).getDay()+6)%7;
+    acc[i].total++; if(habits[k][id]) acc[i].done++;
+  });
+  return acc;
+}
+function weekRate(id, week){
+  let done = 0, total = 0;
+  week.days.forEach(d => {
+    if(d.future || d.before) return;
+    total++; if(habitDay(d.k)[id]) done++;
+  });
+  return {done, total};
+}
+function dayScore(k){
+  return HABITS.reduce((a,h) => a + (habitDay(k)[h.id] ? 1 : 0), 0);
+}
+
+function firstHabitDay(){
+  const ks = Object.keys(habits).sort();
+  return ks.length ? ks[0] : iso(today());
+}    // [{d, k, ex, reason, sets}]
 const REASONS = [
   {id:"schmerz", t:"Schmerz / Beschwerden", warn:true},
   {id:"belegt",  t:"Gerät oder Bank belegt"},
@@ -426,11 +561,134 @@ function viewHeute(){
       <div class="eyebrow">${DAYNAME[today().getDay()]} · ${today().toLocaleDateString("de-DE",{day:"2-digit",month:"long"})} · Woche ${trainWeek()}</div>
     </div>
     <div class="wrap">${dlBanner}<div class="card">${body}${shift}</div>
+    ${habitCard(habitDate)}
     <div class="card" style="display:flex;justify-content:space-between;align-items:center">
       <div><div class="eyebrow">7-Tage-Schnitt</div>
       <div class="num" style="font-size:26px;font-weight:600">${avg?avg.toFixed(2)+" kg":"—"}</div></div>
       <button class="go ghost" style="width:auto;padding:12px 18px;margin:0" onclick="go('werte')">Wiegen</button>
     </div></div>`;
+}
+
+function habitCard(d){
+  const day = d || iso(today());
+  const isToday = day === iso(today());
+  const y = new Date(today()); y.setDate(y.getDate() - 1);
+  const v = habitDay(day);
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <div class="eyebrow">${isToday ? "Heute abhaken" : "Gestern nachtragen"}</div>
+      <div style="display:flex;gap:14px">
+        <button class="eyebrow" style="color:var(--amber)"
+          onclick="habitDate='${isToday ? iso(y) : iso(today())}';render()">${isToday ? "gestern" : "heute"}</button>
+        <button class="eyebrow" style="color:var(--amber)" onclick="openHist()">Verlauf</button>
+      </div>
+    </div>
+    <div class="habits">${HABITS.map(h => {
+      const on = !!v[h.id];
+      return `<button class="hb${on ? " on" : ""}" onclick="toggleHabit('${h.id}','${day}')">
+        <i>${on ? "✓" : ""}</i><b>${h.t}</b><span>${h.z}</span></button>`;
+    }).join("")}</div>
+  </div>`;
+}
+let habitDate = null;
+
+let histSel = "all", histDay = null;
+const HB = document.getElementById("hist");
+
+function openHist(){
+  if(!Object.keys(habits).length) return;
+  HB.classList.remove("hide"); document.body.style.overflow = "hidden"; drawHist();
+}
+function closeHist(){
+  HB.classList.add("hide"); document.body.style.overflow = ""; histDay = null; render();
+}
+function histPick(id){ histSel = id; histDay = null; drawHist() }
+function histTap(k){
+  if(histSel === "all"){ histDay = (histDay === k ? null : k) }
+  else { toggleHabitSilent(histSel, k) }
+  drawHist();
+}
+function toggleHabitSilent(id, d){
+  const day = habits[d] || (habits[d] = {});
+  day[id] = day[id] ? 0 : 1;
+  DB.set("habits", habits);
+}
+
+function drawHist(){
+  const weeks = histWeeks();
+  const sel = HABITS.find(x => x.id === histSel);
+  const de = k => new Date(k).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"});
+
+  // Kalender
+  let cal = `<div class="cal"><div class="calhead"><span></span>${WD.map(w=>`<span>${w}</span>`).join("")}</div>`;
+  weeks.forEach(w => {
+    cal += `<div class="calrow"><span class="wk">${w.mon.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})}</span>`;
+    w.days.forEach(d => {
+      if(d.future || d.before){ cal += `<span class="cell na"></span>`; return }
+      if(sel){
+        const on = !!habitDay(d.k)[sel.id];
+        cal += `<span class="cell ${on?"on":(habits[d.k]?"off":"empty")}" onclick="histTap('${d.k}')"></span>`;
+      } else {
+        const sc = dayScore(d.k);
+        cal += `<span class="cell s${sc}${histDay===d.k?" pick":""}" onclick="histTap('${d.k}')">${sc||""}</span>`;
+      }
+    });
+    cal += `</div>`;
+  });
+  cal += `</div>`;
+
+  // Wochentagsmuster + Wochentrend (nur bei einzelner Gewohnheit)
+  let detail = "";
+  if(sel){
+    const wr = weekdayRate(sel.id);
+    const valid = wr.map((x,i)=>({i, p: x.total ? x.done/x.total : null})).filter(x => x.p !== null);
+    const worst = valid.length > 2 ? valid.reduce((a,b)=> b.p < a.p ? b : a) : null;
+    const best  = valid.length > 2 ? valid.reduce((a,b)=> b.p > a.p ? b : a) : null;
+    detail = `<h3>Nach Wochentag</h3><div class="wdbars">${wr.map((x,i) => {
+      const p = x.total ? x.done/x.total : 0;
+      return `<div class="wdb"><i style="height:${Math.max(4, p*100)}%" class="${worst&&worst.i===i?"worst":""}"></i>
+        <b>${WD[i]}</b><span>${x.total?Math.round(p*100)+"%":"—"}</span></div>`;
+    }).join("")}</div>
+    ${worst && best && worst.i !== best.i
+      ? `<p class="hint">Schwächster Tag: <b>${WD[worst.i]}</b> (${Math.round(worst.p*100)}%), stärkster: <b>${WD[best.i]}</b> (${Math.round(best.p*100)}%). Wenn das über mehrere Wochen bleibt, liegt es am Wochenrhythmus — nicht am Willen.</p>`
+      : `<p class="hint">Für ein belastbares Wochentagsmuster braucht es etwa drei Wochen Daten.</p>`}
+    <h3>Quote je Woche</h3><div class="wtrend">${weeks.map(w => {
+      const r = weekRate(sel.id, w);
+      const p = r.total ? r.done/r.total : 0;
+      return `<div class="wt"><i style="height:${Math.max(4, p*100)}%"></i>
+        <span>${r.total?r.done:"—"}</span></div>`;
+    }).join("")}</div>
+    <p class="hint">Balkenhöhe = Anteil erfüllter Tage, Zahl = Tage in der Woche. Links alt, rechts diese Woche.</p>`;
+  } else if(histDay){
+    const v = habitDay(histDay);
+    detail = `<h3>${new Date(histDay).toLocaleDateString("de-DE",{weekday:"long",day:"2-digit",month:"long"})}</h3>
+      <div class="habits">${HABITS.map(h =>
+        `<button class="hb${v[h.id]?" on":""}" onclick="toggleHabitSilent('${h.id}','${histDay}');drawHist()">
+          <i>${v[h.id]?"✓":""}</i><b>${h.t}</b><span>${h.z}</span></button>`).join("")}</div>
+      <p class="hint">Nachtragen ist ausdrücklich erlaubt — lückenhafte Daten sind schlechter als spät eingetragene.</p>`;
+  } else {
+    const tot = Object.keys(habits).length;
+    const full = Object.keys(habits).filter(k => dayScore(k) === 4).length;
+    detail = `<h3>Überblick</h3>
+      <div class="ovw">${HABITS.map(h => {
+        const r = habitRate(h.id, 28), p = r.total ? Math.round(r.done/r.total*100) : 0;
+        return `<div class="ov ${p>=80?"good":p>=60?"mid":"low"}" onclick="histPick('${h.id}')">
+          <b>${p}%</b><span>${h.t}</span></div>`;
+      }).join("")}</div>
+      <p class="hint">${tot} Tage erfasst, davon ${full} mit allen vier Haken.
+      Tippe eine Kachel für Details oder einen Tag im Kalender zum Nachtragen.
+      Die Zahl im Kalender zeigt, wie viele der vier an dem Tag erfüllt waren.</p>`;
+  }
+
+  HB.innerHTML = `<div class="rtop"><button class="eyebrow" onclick="closeHist()">Zurück</button>
+      <span class="eyebrow">Verlauf</span></div>
+    <div class="histbody">
+      <div class="seg histseg">
+        <button class="${histSel==="all"?"on":""}" onclick="histPick('all')">Alle</button>
+        ${HABITS.map(h => `<button class="${histSel===h.id?"on":""}" onclick="histPick('${h.id}')">${h.t}</button>`).join("")}
+      </div>
+      ${cal}${detail}
+    </div>`;
 }
 
 function askAge(){
@@ -543,6 +801,22 @@ function viewWerte(){
       (x.hr ? `<span class="num">${x.hr} S/min</span>`
             : `<button class="num" style="color:var(--amber);font-size:13px" onclick="addHR(${x.i})">Puls +</button>`) +
       `</div>`).join("") + `</div>`;
+  }
+  if(Object.keys(habits).length){
+    const days = [];
+    for(let i = 27; i >= 0; i--){ const dt = new Date(today()); dt.setDate(dt.getDate()-i); days.push(iso(dt)) }
+    h += `<h2>Gewohnheiten</h2><div class="card">` + HABITS.map(x => {
+      const r7 = habitRate(x.id, 7), r28 = habitRate(x.id, 28);
+      const pct = r28.total ? Math.round(r28.done / r28.total * 100) : 0;
+      return `<div class="hrow">
+        <div class="hmeta" onclick="histSel='${x.id}';openHist()"><b>${x.t}</b><span>${x.z}</span></div>
+        <div class="hdots">${days.map(d =>
+          `<i class="${habitDay(d)[x.id] ? "on" : (habits[d] ? "off" : "na")}"></i>`).join("")}</div>
+        <div class="hpct ${pct>=80?"good":pct>=60?"mid":"low"}">${pct}%<em>${r7.done}/${r7.total} Wo.</em></div>
+      </div>`;
+    }).join("") + `<button class="skip" style="margin-top:12px" onclick="histSel='all';openHist()">Ganzen Verlauf ansehen</button>
+      <p class="muted" style="font-size:12px;margin-top:12px">Vier Wochen, links alt, rechts heute.
+      Es geht um die Quote, nicht um eine ununterbrochene Serie — 80 % über zwölf Wochen schlägt zwei perfekte Wochen und dann nichts mehr.</p></div>`;
   }
   h += `<h2>Datensicherung</h2><div class="card">
       <p class="muted" style="font-size:13.5px">Alle Daten liegen nur auf diesem iPhone. Löschst du das Symbol vom Home-Bildschirm, sind sie weg. Etwa monatlich sichern — die Datei landet in "Dateien" und zusätzlich in der Zwischenablage.</p>
@@ -673,6 +947,16 @@ function buildReport(){
     });
   } else L.push("nichts ausgelassen");
   L.push("");
+
+  L.push("GEWOHNHEITEN (Quote, 4 Wochen / letzte 7 Tage)");
+  if(Object.keys(habits).length){
+    HABITS.forEach(x => {
+      const r28 = habitRate(x.id, 28), r7 = habitRate(x.id, 7);
+      const pct = r28.total ? Math.round(r28.done / r28.total * 100) : 0;
+      L.push(`${x.lang}: ${pct}% (${r28.done}/${r28.total}) — letzte Woche ${r7.done}/${r7.total}`);
+    });
+  } else L.push("nicht erfasst");
+  L.push("");
   L.push("SUBJEKTIV (bitte ausfüllen)");
   L.push("Energie im Training: ");
   L.push("Schlaf: ");
@@ -699,7 +983,7 @@ function addHR(idx){
   const v = parseInt(prompt("Durchschnittspuls dieser Einheit?") || "");
   if(v > 40 && v < 230){ cardioLog[idx].hr = v; DB.set("cardio", cardioLog); render(); }
 }
-const KEYS = ["weights","lifts","done","cardio","skips","age","vol","mute"];
+const KEYS = ["weights","lifts","done","cardio","skips","habits","age","vol","mute"];
 function exportData(){
   const data = {v:1, exported:iso(today())};
   KEYS.forEach(k => { const v = DB.get(k, null); if(v !== null) data[k] = v });
