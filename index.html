@@ -124,6 +124,20 @@ h2{font-family:var(--disp);text-transform:uppercase;letter-spacing:.13em;
   margin-bottom:9px;font-size:15.5px}
 .reason:active{background:var(--surf2)}
 .reason.warn{border-color:rgba(233,115,107,.45);color:var(--rose)}
+.reason.swap{border-color:var(--amber)}
+.reason.swap b{color:var(--amber);font-size:15.5px}
+.reason.swap span{font-size:12.5px;color:var(--mute)}
+.rir{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.rir button{background:var(--amber);color:#14202C;border-radius:13px;padding:13px 4px;text-align:center}
+.rir button:nth-child(1){background:var(--surf2);color:var(--chalk)}
+.rir button:nth-child(3){background:var(--surf2);color:var(--chalk)}
+.rir b{display:block;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.02em}
+.rir span{font-size:9.5px;opacity:.72;letter-spacing:.06em}
+.last.up{color:var(--mint)} .last.down{color:var(--rose)}
+.shift{margin-top:18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.shift .eyebrow{flex:1 0 100%;margin-bottom:2px}
+.shift button{border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13px;color:var(--mute)}
+.card.dl{border-color:var(--amber);background:rgba(242,160,61,.08)}
 
 /* ---------- meals ---------- */
 .meal{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -182,27 +196,27 @@ nav button i{display:block;font-size:19px;font-style:normal;margin-bottom:2px;op
 const PLAN = {
   A: { name:"Kniebeuge / Horizontale", pairs:[
     { id:"1", rest:135, ex:[
-      {n:"Kniebeuge (Langhantel)", t:"4 × 5–8", w:75, k:"bar"},
-      {n:"Bankdrücken (Langhantel)", t:"4 × 5–8", w:60, k:"bar"}], rounds:4 },
+      {n:"Kniebeuge (Langhantel)", t:"4 × 5–8", w:75, k:"bar", inc:5, alt:{n:"Beinpresse", w:140, k:"stack", inc:5}},
+      {n:"Bankdrücken (Langhantel)", t:"4 × 5–8", w:60, k:"bar", inc:2.5, alt:{n:"Kurzhantel-Bankdrücken", w:26, k:"db", inc:2.5}}], rounds:4 },
     { id:"2", rest:75, ex:[
-      {n:"Rumänisches Kreuzheben", t:"3 × 8–10", w:65, k:"bar"},
-      {n:"Langhantelrudern", t:"3 × 8–10", w:50, k:"bar"}], rounds:3 }
+      {n:"Rumänisches Kreuzheben", t:"3 × 8–10", w:65, k:"bar", inc:2.5, alt:{n:"Beinbeuger liegend", w:45, k:"stack", inc:2.5}},
+      {n:"Langhantelrudern", t:"3 × 8–10", w:50, k:"bar", inc:2.5, alt:{n:"Kabelrudern eng", w:55, k:"stack", inc:2.5}}], rounds:3 }
   ]},
   B: { name:"Kreuzheben / Vertikale", pairs:[
     { id:"1", rest:135, ex:[
-      {n:"Kreuzheben (Trap-Bar)", t:"4 × 3–5", w:107.5, k:"trap"},
-      {n:"Schulterdrücken stehend", t:"4 × 6–8", w:37.5, k:"bar"}], rounds:4 },
+      {n:"Kreuzheben (Trap-Bar)", t:"4 × 3–5", w:107.5, k:"trap", inc:5, alt:{n:"Kreuzheben konventionell", w:97.5, k:"bar", inc:5}},
+      {n:"Schulterdrücken stehend", t:"4 × 6–8", w:37.5, k:"bar", inc:2.5, alt:{n:"Kurzhantel-Schulterdrücken", w:16, k:"db", inc:2.5}}], rounds:4 },
     { id:"2", rest:75, ex:[
-      {n:"Bulgarian Split Squat", t:"3 × 8–10 / Bein", w:14, k:"db"},
-      {n:"Klimmzug", t:"3 × 6–10", w:0, k:"bw"}], rounds:3 }
+      {n:"Bulgarian Split Squat", t:"3 × 8–10 / Bein", w:14, k:"db", inc:2, alt:{n:"Ausfallschritte gehend", w:12, k:"db", inc:2}},
+      {n:"Klimmzug", t:"3 × 6–10", w:0, k:"bw", inc:2.5, alt:{n:"Latzug eng", w:55, k:"stack", inc:2.5}}], rounds:3 }
   ]},
   C: { name:"Frontkniebeuge / Mix", pairs:[
     { id:"1", rest:120, ex:[
-      {n:"Frontkniebeuge", t:"4 × 6–8", w:62.5, k:"bar"},
-      {n:"Schrägbankdrücken (KH)", t:"4 × 8–10", w:22, k:"db"}], rounds:4 },
+      {n:"Frontkniebeuge", t:"4 × 6–8", w:62.5, k:"bar", inc:2.5, alt:{n:"Hackenschmidt-Maschine", w:60, k:"stack", inc:2.5}},
+      {n:"Schrägbankdrücken (KH)", t:"4 × 8–10", w:22, k:"db", inc:2.5, alt:{n:"Schrägbank Multipresse", w:50, k:"bar", inc:2.5}}], rounds:4 },
     { id:"2", rest:75, ex:[
-      {n:"Hip Thrust (Langhantel)", t:"3 × 8–12", w:70, k:"bar"},
-      {n:"Latzug weit", t:"3 × 8–12", w:40, k:"stack"}], rounds:3 }
+      {n:"Hip Thrust (Langhantel)", t:"3 × 8–12", w:70, k:"bar", inc:5, alt:{n:"Beinpresse Füße hoch", w:120, k:"stack", inc:5}},
+      {n:"Latzug weit", t:"3 × 8–12", w:40, k:"stack", inc:2.5, alt:{n:"Klimmzug breit", w:0, k:"bw", inc:2.5}}], rounds:3 }
   ]}
 };
 const SWITCH = 15;                       // Sekunden Wechsel innerhalb des Paares
@@ -296,7 +310,7 @@ const isTrain = () => !!dayKey();
 const age = () => DB.get("age", null);
 const hrMax = () => { const a = age(); return a ? Math.round(208 - 0.7*a) : null; };
 const hrBand = pct => { const m = hrMax(); return m ? `${Math.round(m*pct[0])}–${Math.round(m*pct[1])} S/min` : null; };
-const cardioLog = DB.get("cardio", []);
+const cardioLog = DB.get("cardio", []);   // [{d, t, min, hr}]
 const skipLog   = DB.get("skips", []);    // [{d, k, ex, reason, sets}]
 const REASONS = [
   {id:"schmerz", t:"Schmerz / Beschwerden", warn:true},
@@ -306,7 +320,48 @@ const REASONS = [
   {id:"ersetzt", t:"Durch andere Übung ersetzt"},
   {id:"sonst",   t:"Anderer Grund"}
 ];
-const REASON_T = Object.fromEntries(REASONS.map(r => [r.id, r.t]));   // [{d, t:"zone2"|"int"|"mob", min}]
+const REASON_T = Object.fromEntries(REASONS.map(r => [r.id, r.t]));
+
+// Obere Wiederholungszahl aus der Zielvorgabe, z. B. "4 × 5–8" -> 8
+function topReps(t){
+  const m = (t||"").match(/(\d+)\s*[–-]\s*(\d+)/);
+  return m ? parseInt(m[2]) : null;
+}
+/* Steigerungsvorschlag nach der doppelten Progression:
+   obere Wiederholungszahl bei Ziel-RIR in allen Sätzen erreicht -> Gewicht hoch.
+   Zweimal dasselbe Gewicht ohne Erreichen -> 10 % runter und neu hocharbeiten. */
+function suggest(ex){
+  const l = lifts[ex.n];
+  if(!l || !l.h || !l.h.length) return {w: ex.w, why:"Startvorschlag"};
+  const top = topReps(ex.t), inc = ex.inc || 2.5;
+  const days = [...new Set(l.h.map(x => x.d))].slice(-3);
+  const lastDay = days[days.length-1];
+  const sets = l.h.filter(x => x.d === lastDay);
+  const minR = Math.min(...sets.map(x => x.r));
+  const w = sets[sets.length-1].w;
+  const maxRir = Math.max(...sets.map(x => x.rir ?? 2));
+  if(top && minR >= top && maxRir <= 3){
+    const step = maxRir >= 3 ? inc * 2 : inc;      // ging leicht -> zwei Stufen
+    return {w: w + step, why: `letzte ${w} kg × ${minR}${maxRir>=3?", ging leicht":""}`, up:true};
+  }
+  // Stagnation: zwei Einheiten gleiches Gewicht ohne obere Wiederholungszahl
+  if(days.length >= 2 && top){
+    const prev = l.h.filter(x => x.d === days[days.length-2]);
+    if(prev.length && prev[0].w === w && Math.min(...prev.map(x=>x.r)) < top && minR < top)
+      return {w: Math.round(w * 0.9 / (ex.inc||2.5)) * (ex.inc||2.5),
+              why: "zweimal gehalten — 10 % runter und neu hocharbeiten", down:true};
+  }
+  return {w, why: `letzte ${w} kg × ${minR}`};
+}
+
+// Trainingswoche seit der ersten absolvierten Einheit
+function trainWeek(){
+  const done = DB.get("done", []);
+  if(!done.length) return 1;
+  const first = new Date(done[0].d);
+  return Math.floor((today() - first) / 6048e5) + 1;
+}
+const isDeload = () => trainWeek() % 7 === 0;
 const DAYNAME = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
 
 /* =======================================================================
@@ -359,11 +414,18 @@ function viewHeute(){
       ${macroGrid(m)}
       <button class="go ghost" style="margin-top:16px" onclick="startMob()">Mobility freiwillig</button>`;
   }
+  const shift = `<div class="shift"><span class="eyebrow">Stattdessen trainieren</span>
+    ${["A","B","C"].filter(x => x !== dp.k).map(x =>
+      `<button onclick="startRun('${x}')">Einheit ${x}</button>`).join("")}</div>`;
+  const dlBanner = isDeload()
+    ? `<div class="card dl"><div class="eyebrow">Woche ${trainWeek()} · Deload</div>
+       <p style="font-size:14px;margin-top:6px">Diese Woche Sätze halbieren und bei 3–4 RIR bleiben, Gewichte gleich lassen.
+       Bei Supersätzen mit ihrer höheren Belastung ist das kein Luxus.</p></div>` : "";
   const avg = avg7();
   return `<div class="head wrap">
-      <div class="eyebrow">${DAYNAME[today().getDay()]} · ${today().toLocaleDateString("de-DE",{day:"2-digit",month:"long"})}</div>
+      <div class="eyebrow">${DAYNAME[today().getDay()]} · ${today().toLocaleDateString("de-DE",{day:"2-digit",month:"long"})} · Woche ${trainWeek()}</div>
     </div>
-    <div class="wrap"><div class="card">${body}</div>
+    <div class="wrap">${dlBanner}<div class="card">${body}${shift}</div>
     <div class="card" style="display:flex;justify-content:space-between;align-items:center">
       <div><div class="eyebrow">7-Tage-Schnitt</div>
       <div class="num" style="font-size:26px;font-weight:600">${avg?avg.toFixed(2)+" kg":"—"}</div></div>
@@ -482,6 +544,14 @@ function viewWerte(){
             : `<button class="num" style="color:var(--amber);font-size:13px" onclick="addHR(${x.i})">Puls +</button>`) +
       `</div>`).join("") + `</div>`;
   }
+  h += `<h2>Datensicherung</h2><div class="card">
+      <p class="muted" style="font-size:13.5px">Alle Daten liegen nur auf diesem iPhone. Löschst du das Symbol vom Home-Bildschirm, sind sie weg. Etwa monatlich sichern — die Datei landet in "Dateien" und zusätzlich in der Zwischenablage.</p>
+      <button class="go" id="exBtn" style="margin-top:12px" onclick="exportData()">Daten sichern</button>
+      <button class="skip" style="margin-top:8px" onclick="importData()">Sicherung einspielen</button>
+      <textarea id="imp" class="hide" rows="4" placeholder="Sicherung hier einfügen, dann erneut auf 'Sicherung einspielen' tippen"
+        style="width:100%;margin-top:10px;background:var(--surf2);color:var(--chalk);
+        border:1px solid var(--line);border-radius:12px;padding:10px;font-family:var(--data);font-size:11px"></textarea>
+    </div>`;
   h += `<h2>Ton</h2><div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
         <div><b style="font-size:15px">Signaltöne</b><br>
@@ -531,7 +601,7 @@ function weekAvgs(){
 function buildReport(){
   const de = d => new Date(d).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"});
   const L = [];
-  L.push("FLEXI-CARB — STANDSBERICHT " + de(today()));
+  L.push("FLEXI-CARB — STANDSBERICHT " + de(today()) + " · Trainingswoche " + trainWeek() + (isDeload()?" (Deload)":""));
   L.push("");
 
   // Gewicht
@@ -550,8 +620,12 @@ function buildReport(){
   const ent = Object.entries(lifts);
   if(ent.length){
     ent.forEach(([n,l]) => {
-      const h = (l.h||[{d:l.date,w:l.w,r:l.r}]).slice().reverse().slice(0,5);
-      L.push(`${n}: ` + h.map(x => `${x.w}×${x.r} (${x.d.slice(8,10)}.${x.d.slice(5,7)}.)`).join("  ←  "));
+      const seen = {}, uniq = [];
+      (l.h||[{d:l.date,w:l.w,r:l.r,rir:l.rir}]).slice().reverse().forEach(x => {
+        if(!seen[x.d]){ seen[x.d] = 1; uniq.push(x) } });
+      const h = uniq.slice(0,5);
+      const RIRT = {3:" leicht", 2:"", 0:" Grenze"};
+      L.push(`${n}: ` + h.map(x => `${x.w}×${x.r}${RIRT[x.rir] ?? ""} (${x.d.slice(8,10)}.${x.d.slice(5,7)}.)`).join("  ←  "));
     });
   } else L.push("noch keine Sätze protokolliert");
   L.push("");
@@ -624,6 +698,34 @@ function showReport(txt){
 function addHR(idx){
   const v = parseInt(prompt("Durchschnittspuls dieser Einheit?") || "");
   if(v > 40 && v < 230){ cardioLog[idx].hr = v; DB.set("cardio", cardioLog); render(); }
+}
+const KEYS = ["weights","lifts","done","cardio","skips","age","vol","mute"];
+function exportData(){
+  const data = {v:1, exported:iso(today())};
+  KEYS.forEach(k => { const v = DB.get(k, null); if(v !== null) data[k] = v });
+  const txt = JSON.stringify(data);
+  // Datei zum Ablegen in iCloud/Dateien
+  try{
+    const url = URL.createObjectURL(new Blob([txt], {type:"application/json"}));
+    const a = document.createElement("a");
+    a.href = url; a.download = `flexicarb-${iso(today())}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }catch(e){}
+  // zusätzlich in die Zwischenablage
+  if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).catch(()=>{});
+  const b = document.getElementById("exBtn");
+  if(b){ b.textContent = "Gesichert — Datei und Zwischenablage"; setTimeout(()=>b.textContent="Daten sichern",3000) }
+}
+function importData(){
+  const el = document.getElementById("imp");
+  if(el.classList.contains("hide")){ el.classList.remove("hide"); el.focus(); return }
+  let d;
+  try{ d = JSON.parse(el.value) }catch(e){ alert("Das ist keine gültige Sicherung."); return }
+  if(!d || typeof d !== "object" || !("weights" in d || "lifts" in d)){ alert("Das ist keine gültige Sicherung."); return }
+  if(!confirm("Alle aktuellen Daten werden durch die Sicherung ersetzt. Fortfahren?")) return;
+  KEYS.forEach(k => { if(k in d) DB.set(k, d[k]) });
+  location.reload();
 }
 function toggleMute(){ DB.set("mute", !DB.get("mute", false)); render(); }
 function setVol(v){ DB.set("vol", v); audio(); tone(700,.12,.16); render(); }
@@ -881,9 +983,19 @@ function askSkip(){
     <div class="sheet">
       <div class="exname" style="font-size:24px;margin-bottom:4px">${st.ex.n}</div>
       <p class="muted" style="font-size:13.5px;margin-bottom:18px">Noch ${rest} ${rest===1?"Satz":"Sätze"} offen. Warum?</p>
+      ${st.ex.alt && !run.swap[st.ex.n] ? `<button class="reason swap" onclick="doSwap()">
+         <b>Stattdessen: ${st.ex.alt.n}</b><br><span>gleiche Sätze, Gewicht wird vorgeschlagen</span></button>` : ""}
       ${REASONS.map(r => `<button class="reason${r.warn?" warn":""}" onclick="doSkip('${r.id}')">${r.t}</button>`).join("")}
       <p class="muted" style="font-size:12px;margin-top:16px">Der Grund landet im Bericht — daraus lässt sich erkennen, ob der Plan angepasst werden muss.</p>
     </div>`;
+}
+function doSwap(){
+  const st = run.steps[run.i];
+  const a = st.ex.alt;
+  run.swap[st.ex.n] = {n:a.n, t:st.ex.t, w:a.w, k:a.k, inc:a.inc};
+  skipLog.push({d:iso(today()), k:run.key, ex:st.ex.n, reason:"ersetzt", sets:0, alt:a.n});
+  DB.set("skips", skipLog.slice(-200));
+  drawRun();
 }
 function doSkip(reason){
   const st = run.steps[run.i];
@@ -908,7 +1020,7 @@ function doSkip(reason){
 
 function startRun(key){
   audio(); keepAwake(true);
-  run = {mode:"kraft", key, steps:buildSteps(key), i:0, left:0, t0:Date.now(), skip:new Set()};
+  run = {mode:"kraft", key, steps:buildSteps(key), i:0, left:0, t0:Date.now(), skip:new Set(), swap:{}};
   R.classList.remove("hide"); document.body.style.overflow="hidden";
   drawRun();
 }
@@ -916,17 +1028,18 @@ function endRun(){
   clearInterval(tick); tick=null; run=null; keepAwake(false);
   R.classList.add("hide"); document.body.style.overflow=""; render();
 }
-function nextStep(){
+function nextStep(rir){
   const st = run.steps[run.i];
   if(st && st.type==="set"){
+    const ex = run.swap[st.ex.n] || st.ex;
     const w = parseFloat((document.getElementById("sw")?.value||"").replace(",","."));
     const r = parseInt(document.getElementById("sr")?.value||"");
     if(w>0 && r>0){
       const d = iso(today());
-      const prev = lifts[st.ex.n] || {};
-      const h = (prev.h || []).filter(x => x.d !== d);
-      h.push({d, w, r});
-      lifts[st.ex.n] = {w, r, date:d, h: h.slice(-16)};
+      const prev = lifts[ex.n] || {};
+      const h = (prev.h || []);
+      h.push({d, w, r, rir: rir ?? 2});
+      lifts[ex.n] = {w, r, rir: rir ?? 2, date:d, h: h.slice(-40)};
       DB.set("lifts",lifts);
       const done = DB.get("done",[]);
       if(!done.some(x => x.d===d && x.k===run.key)){ done.push({d, k:run.key}); DB.set("done", done); }
@@ -948,26 +1061,32 @@ function drawRun(){
       <span class="eyebrow num">${mins} min · Einheit ${run.key}${WL?' <span class="wl">· Display an</span>':''}</span></div>`;
 
   if(st.type==="set"){
-    const l = lifts[st.ex.n];
+    const ex = run.swap[st.ex.n] || st.ex;
+    const sg = suggest(ex);
+    const dl = isDeload();
     R.innerHTML = top + `<div class="rmid">
-        <div class="lbl">Paar ${st.pair} · Runde ${st.round} von ${st.rounds}</div>
-        <div class="exname">${st.ex.n}</div>
-        <div class="target">${st.ex.t}</div>
+        <div class="lbl">Paar ${st.pair} · Runde ${st.round} von ${st.rounds}${dl?" · Deload":""}</div>
+        <div class="exname">${ex.n}</div>
+        <div class="target">${ex.t}${dl?" · halbe Sätze, 3–4 RIR":""}</div>
         ${queueHTML(run.i+1)}
       </div>
       <div class="rbot">
         <div class="logrow">
           <div class="field"><label>Gewicht kg</label>
             <input id="sw" type="number" step="0.5" inputmode="decimal"
-              value="${l?l.w:(st.ex.w??"")}" oninput="plates()"></div>
+              value="${sg.w ?? ""}" oninput="plates()"></div>
           <div class="field"><label>Wiederholungen</label>
             <input id="sr" type="number" inputmode="numeric" value=""></div>
         </div>
         <div class="last" id="plt"></div>
-        ${l?`<div class="last">zuletzt ${l.w} kg × ${l.r}</div>`
-            :`<div class="last">Startvorschlag ${st.ex.k==="db"?"2 × "+st.ex.w+" kg":st.ex.w+" kg"} — im ersten Satz prüfen, ob 2 Wdh. übrig bleiben</div>`}
-        <button class="go" onclick="nextStep()">Satz fertig</button>
-        <button class="skip" onclick="askSkip()">Übung überspringen</button>
+        <div class="last ${sg.up?"up":""}${sg.down?" down":""}">${
+          sg.up ? `↑ steigern — ${sg.why}` : sg.down ? `↓ ${sg.why}` : sg.why}</div>
+        <div class="rir">
+          <button onclick="nextStep(3)"><b>ging leicht</b><span>3+ RIR</span></button>
+          <button onclick="nextStep(2)"><b>passte</b><span>2 RIR</span></button>
+          <button onclick="nextStep(0)"><b>war Grenze</b><span>0–1 RIR</span></button>
+        </div>
+        <button class="skip" onclick="askSkip()">Überspringen oder tauschen</button>
       </div>`;
     plates();
   } else {
@@ -975,7 +1094,7 @@ function drawRun(){
     R.innerHTML = top + `<div class="rmid">
         <div class="lbl">${st.sec<=SWITCH?"Wechsel":"Pause"}</div>
         <div class="clock" id="clk">${fmt(st.sec)}</div>
-        <div class="next">Als Nächstes<br><b>${(nextSet(run.i+1)||{n:"—"}).n}</b></div>
+        <div class="next">Als Nächstes<br><b>${(() => { const x = nextSet(run.i+1); return x ? ((run.swap && run.swap[x.n]) ? run.swap[x.n].n : x.n) : "—" })()}</b></div>
         ${queueHTML(run.i+1)}
       </div>
       <div class="rbot"><button class="go ghost" onclick="nextStep()">Weiter</button></div>`;
@@ -1000,8 +1119,9 @@ function queue(from){
   for(let j = from; j < run.steps.length; j++){
     const st = run.steps[j];
     if(st.type !== "set" && st.type !== "hold") continue;
-    const n = st.ex.n;
+    let n = st.ex.n;
     if(run.skip && run.skip.has(n)) continue;
+    if(run.swap && run.swap[n]) n = run.swap[n].n;
     if(idx[n] === undefined){ idx[n] = out.length; out.push({n, c:1}); }
     else out[idx[n]].c++;
   }
@@ -1024,7 +1144,7 @@ function queueHTML(from){
 const BAR = {bar:20, trap:25};
 function plates(){
   const box = document.getElementById("plt"); if(!box || !run) return;
-  const st = run.steps[run.i]; const bar = BAR[st.ex.k];
+  const st = run.steps[run.i]; const ex = run.swap[st.ex.n] || st.ex; const bar = BAR[ex.k];
   const w = parseFloat((document.getElementById("sw")?.value||"").replace(",","."));
   if(!bar || !w || w<=bar){ box.textContent = bar&&w?`Nur die Stange (${bar} kg)`:""; return }
   let side = (w-bar)/2, out = [];
